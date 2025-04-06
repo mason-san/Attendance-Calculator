@@ -1,10 +1,153 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Planner</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; font-size:16px; }
+    body { font-family: 'Roboto', sans-serif; background:#ecf0f1; color:#2c3e50; line-height:1.6; }
+
+    /* Container */
+    .container { max-width:1200px; margin:0 auto; padding:0 1rem; }
+
+    /* Header & Nav */
+    header {
+      position: fixed; top:0; left:0; width:100%;
+      background:#2c3e50; padding:1rem 0; z-index:1000;
+    }
+    nav { display:flex; align-items:center; justify-content:space-between; }
+    .logo { color:#1abc9c; font-size:1.5rem; font-weight:700; text-decoration:none; }
+    .nav-links { list-style:none; display:flex; gap:1.5rem; }
+    .nav-links a {
+      color:#ecf0f1; text-decoration:none; font-weight:500;
+      transition: color .3s;
+    }
+    .nav-links a:hover { color:#1abc9c; }
+
+    /* Burger Menu */
+    .burger { display:none; cursor:pointer; }
+    .burger div {
+      width:25px; height:3px; background:#ecf0f1;
+      margin:5px 0; transition: all .3s;
+    }
+
+    /* Hero Section */
+    main { padding-top:6rem; }
+    .hero {
+      background:#fff; text-align:center;
+      padding:4rem 1rem; display:flex;
+      flex-direction:column; align-items:center; gap:1rem;
+    }
+    .hero h1 { font-size:2.5rem; }
+    .hero p { max-width:600px; color:#7f8c8d; }
+    .btn {
+      display:inline-block; padding:.75rem 1.5rem;
+      background:#1abc9c; color:#fff; border:none;
+      border-radius:4px; text-decoration:none; font-weight:500;
+      transition: background .3s;
+    }
+    .btn:hover { background:#16a085; }
+
+    /* Features Section */
+    .features { background:#ecf0f1; padding:4rem 1rem; }
+    .features h2 { text-align:center; margin-bottom:2rem; }
+    .features-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+      gap:2rem; max-width:1000px; margin:0 auto;
+    }
+    .feature {
+      background:#fff; padding:2rem; border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      transition: transform .3s;
+    }
+    .feature:hover { transform: translateY(-5px); }
+    .feature h3 { margin-bottom:1rem; color:#1abc9c; }
+
+    /* Footer */
+    footer {
+      background:#2c3e50; color:#ecf0f1;
+      text-align:center; padding:2rem 1rem; margin-top:2rem;
+    }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .nav-links {
+        display:none;
+        position:absolute; top:100%; left:0; right:0;
+        background:#2c3e50; flex-direction:column; padding:1rem;
+      }
+      .nav-links.active { display:flex; }
+      .burger { display:block; }
+    }
+  </style>
 </head>
 <body>
-    <h1>I'm the dashboard ganggg</h1> 
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">AttendancePlanner</a>
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="{{ url_for('app_blueprint.register') }}">Register</a></li>
+          <li><a href="{{ url_for('app_blueprint.login') }}">Login</a></li>
+        </ul>
+        <div class="burger" id="burger">
+          <div></div><div></div><div></div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Stay on Top of Your Attendance</h1>
+      <p>Log classes, plan your leaves, and predict your final attendance—all in one place.</p>
+      <a href="{{ url_for('app_blueprint.register') }}" class="btn">Get Started</a>
+    </section>
+
+    <section class="features" id="features">
+      <div class="container">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+          <div class="feature">
+            <h3>Track Attendance</h3>
+            <p>Record daily attendance and visualize your progress over time.</p>
+          </div>
+          <div class="feature">
+            <h3>Plan Leaves</h3>
+            <p>See exactly how many days you can afford to miss without dipping below your goal.</p>
+          </div>
+          <div class="feature">
+            <h3>Predict Trends</h3>
+            <p>Use our regression model to forecast your final attendance percentage.</p>
+          </div>
+          <div class="feature">
+            <h3>Smart Alerts</h3>
+            <p>Get notified when you’re close to the minimum attendance threshold.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 AttendancePlanner. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const navLinks = document.querySelector('.nav-links');
+    burger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      burger.classList.toggle('toggle');
+    });
+  </script>
 </body>
 </html>

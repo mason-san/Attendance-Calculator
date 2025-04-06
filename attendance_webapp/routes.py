@@ -15,7 +15,7 @@ def register():
         db.session.commit()
         flash("Account Created! You can now log in", "Success")
         login_user(user)
-        return redirect(url_for("app_blueprint.dashboard"))
+        return redirect(url_for("app_blueprint.home"))
     return render_template("register.html", form=form)
 
 @app_blueprint.route('/login', methods=["GET", "POST"]) 
@@ -26,12 +26,16 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data): 
             login_user(user)
             flash("Login successful!", "Success")
-            return redirect(url_for("app_blueprint.dashboard"))
+            return redirect(url_for("app_blueprint.home"))
         else: 
             flash("Login Failed. Check your email and password", "Danger")
     return render_template("login.html", form=form) 
 
-@app_blueprint.route('/dashboard')
+@app_blueprint.route('/')
+def index(): 
+    return render_template("dashboard.html") 
+
+@app_blueprint.route('/home')
 @login_required
-def dashboard(): 
-    return render_template("dashboard.html")
+def home():
+    return render_template("home.html")
