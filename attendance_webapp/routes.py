@@ -29,7 +29,16 @@ def login():
             return redirect(url_for("app_blueprint.home"))
         else: 
             flash("Login Failed. Check your email and password", "Danger")
-    return render_template("login.html", form=form) 
+    return render_template("login.html", form=form)
+
+@app_blueprint.route('/logout')
+@login_required
+def logout(): 
+    logout_user()
+
+    flash("You have been logged out.", "info")
+
+    return redirect(url_for("app_blueprint.login"))
 
 @app_blueprint.route('/')
 def index(): 

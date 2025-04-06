@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Attendance Planner</title>
+  <title>Dashboard — AttendancePlanner v1.0</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet"/>
   <style>
     /* Reset & Base */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior: smooth; font-size:16px; }
-    body { font-family: 'Roboto', sans-serif; background:#ecf0f1; color:#2c3e50; line-height:1.6; }
+    body { font-family: 'Roboto', sans-serif; background:#ecf0f1; color:#2c3e50; }
 
     /* Container */
     .container { max-width:1200px; margin:0 auto; padding:0 1rem; }
@@ -19,7 +19,10 @@
       position: fixed; top:0; left:0; width:100%;
       background:#2c3e50; padding:1rem 0; z-index:1000;
     }
-    nav { display:flex; align-items:center; justify-content:space-between; }
+    nav {
+      display:flex; align-items:center; justify-content:space-around;
+      max-width:1200px; margin:0 auto; padding:0 1rem;
+    }
     .logo { color:#1abc9c; font-size:1.5rem; font-weight:700; text-decoration:none; }
     .nav-links { list-style:none; display:flex; gap:1.5rem; }
     .nav-links a {
@@ -27,58 +30,73 @@
       transition: color .3s;
     }
     .nav-links a:hover { color:#1abc9c; }
-
-    /* Burger Menu */
-    .burger { display:none; cursor:pointer; }
-    .burger div {
-      width:25px; height:3px; background:#ecf0f1;
-      margin:5px 0; transition: all .3s;
-    }
-
-    /* Hero Section */
-    main { padding-top:6rem; }
-    .hero {
-      background:#fff; text-align:center;
-      padding:4rem 1rem; display:flex;
-      flex-direction:column; align-items:center; gap:1rem;
-    }
-    .hero h1 { font-size:2.5rem; }
-    .hero p { max-width:600px; color:#7f8c8d; }
-    .btn {
-      display:inline-block; padding:.75rem 1.5rem;
+    .btn-add {
       background:#1abc9c; color:#fff; border:none;
-      border-radius:4px; text-decoration:none; font-weight:500;
-      transition: background .3s;
+      padding:.5rem 1rem; border-radius:4px; font-weight:500;
+      cursor:pointer; transition: background .3s;
     }
-    .btn:hover { background:#16a085; }
+    .btn-add:hover { background:#16a085; }
 
-    /* Features Section */
-    .features { background:#ecf0f1; padding:4rem 1rem; }
-    .features h2 { text-align:center; margin-bottom:2rem; }
+    /* Main */
+    main { padding-top:6rem; }
+
+    /* Subjects Grid */
+    #subjects { padding:2rem 0; }
+    #subjects h2 { text-align:center; margin-bottom:1.5rem; }
     .features-grid {
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
-      gap:2rem; max-width:1000px; margin:0 auto;
+      grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+      gap:1.5rem;
     }
-    .feature {
-      background:#fff; padding:2rem; border-radius:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    .subject-card {
+      background:#fff; padding:1.5rem; border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1); position:relative;
       transition: transform .3s;
     }
-    .feature:hover { transform: translateY(-5px); }
-    .feature h3 { margin-bottom:1rem; color:#1abc9c; }
-
-    /* Footer */
-    footer {
-      background:#2c3e50; color:#ecf0f1;
-      text-align:center; padding:2rem 1rem; margin-top:2rem;
+    .subject-card:hover { transform: translateY(-5px); }
+    .subject-card h3 { margin-bottom:1rem; color:#1abc9c; }
+    .subject-card p { margin:0.5rem 0; }
+    .btn-attend {
+      margin-top:1rem; display:block;
+      background:#3498db; color:#fff; border:none;
+      padding:.5rem 1rem; border-radius:4px; font-weight:500;
+      cursor:pointer; transition: background .3s;
     }
+    .btn-attend:hover { background:#2980b9; }
+
+    /* Modal */
+    .modal {
+      display:none; /* hidden by default */
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+    }
+    .modal.show { display:flex; }
+    .modal-content {
+      background:#fff; padding:2rem; border-radius:8px;
+      width:90%; max-width:400px; position:relative;
+      transform: translateY(-20px) scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    .modal.show .modal-content {
+      transform: translateY(0) scale(1);
+    }
+    .close {
+      position:absolute; top:1rem; right:1rem;
+      font-size:1.5rem; cursor:pointer; color:#7f8c8d;
+    }
+    .modal .form-group { margin-bottom:1rem; }
+    .modal .form-group label { display:block; margin-bottom:.5rem; font-weight:500; }
+    .modal .form-group input {
+      width:100%; padding:.75rem; border:1px solid #ccc;
+      border-radius:4px; font-size:1rem;
+      transition: border-color .3s;
+    }
+    .modal .form-group input:focus { border-color:#1abc9c; outline:none; }
 
     /* Responsive */
     @media (max-width:768px) {
       .nav-links {
-        display:none;
-        position:absolute; top:100%; left:0; right:0;
+        display:none; position:absolute; top:100%; left:0; right:0;
         background:#2c3e50; flex-direction:column; padding:1rem;
       }
       .nav-links.active { display:flex; }
@@ -88,66 +106,112 @@
 </head>
 <body>
   <header>
-    <div class="container">
-      <nav>
-        <a href="#" class="logo">AttendancePlanner</a>
+    <nav>
+        <a href="{{ url_for('app_blueprint.dashboard') }}" class="logo">AttendancePlanner</a>
+        <button id="addSubjectBtn" class="btn-add">Add Subject</button>
         <ul class="nav-links">
-          <li><a href="#features">Features</a></li>
-          <li><a href="{{ url_for('app_blueprint.register') }}">Register</a></li>
-          <li><a href="{{ url_for('app_blueprint.login') }}">Login</a></li>
+            <li><a href="{{ url_for('app_blueprint.logout') }}">Logout</a></li>
         </ul>
-        <div class="burger" id="burger">
-          <div></div><div></div><div></div>
-        </div>
-      </nav>
-    </div>
+      <div class="burger" id="burger"><div></div><div></div><div></div></div>
+    </nav>
   </header>
 
   <main>
-    <section class="hero">
-      <h1>Stay on Top of Your Attendance</h1>
-      <p>Log classes, plan your leaves, and predict your final attendance—all in one place.</p>
-      <a href="{{ url_for('app_blueprint.register') }}" class="btn">Get Started</a>
-    </section>
-
-    <section class="features" id="features">
+    <section id="subjects">
       <div class="container">
-        <h2>Key Features</h2>
-        <div class="features-grid">
-          <div class="feature">
-            <h3>Track Attendance</h3>
-            <p>Record daily attendance and visualize your progress over time.</p>
-          </div>
-          <div class="feature">
-            <h3>Plan Leaves</h3>
-            <p>See exactly how many days you can afford to miss without dipping below your goal.</p>
-          </div>
-          <div class="feature">
-            <h3>Predict Trends</h3>
-            <p>Use our regression model to forecast your final attendance percentage.</p>
-          </div>
-          <div class="feature">
-            <h3>Smart Alerts</h3>
-            <p>Get notified when you’re close to the minimum attendance threshold.</p>
-          </div>
+        <h2>Your Subjects</h2>
+        <div id="subjectsGrid" class="features-grid">
+          <!-- JS will inject subject cards here -->
         </div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 AttendancePlanner. All rights reserved.</p>
+  <!-- Add Subject Modal -->
+  <div id="subjectModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="modalClose">&times;</span>
+      <h2>Add New Subject</h2>
+      <form id="subjectForm">
+        <div class="form-group">
+          <label for="subjectName">Subject Name</label>
+          <input type="text" id="subjectName" required />
+        </div>
+        <div class="form-group">
+          <label for="totalClasses">Total Classes</label>
+          <input type="number" id="totalClasses" min="1" required />
+        </div>
+        <div class="form-group">
+          <label for="attendedClasses">Classes Attended</label>
+          <input type="number" id="attendedClasses" min="0" required />
+        </div>
+        <button type="submit" class="btn-add">Add Subject</button>
+      </form>
     </div>
-  </footer>
+  </div>
 
   <script>
-    const burger = document.getElementById('burger');
-    const navLinks = document.querySelector('.nav-links');
-    burger.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-      burger.classList.toggle('toggle');
+    // Toggle mobile nav
+    const burger = document.getElementById('burger'), navLinks = document.querySelector('.nav-links');
+    burger.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+    // Modal logic
+    const addBtn = document.getElementById('addSubjectBtn'), modal = document.getElementById('subjectModal'), closeM = document.getElementById('modalClose');
+    addBtn.addEventListener('click', () => modal.classList.add('show'));
+    closeM.addEventListener('click', () => modal.classList.remove('show'));
+    window.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
+
+    // In-memory store
+    let subjects = [];
+
+    // Handle form submission
+    document.getElementById('subjectForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name     = document.getElementById('subjectName').value.trim(),
+            total    = parseInt(document.getElementById('totalClasses').value),
+            attended = parseInt(document.getElementById('attendedClasses').value);
+      if (!name || total < 1 || attended < 0 || attended > total) return;
+      subjects.push({ id: Date.now(), name, total, attended });
+      renderSubjects();
+      e.target.reset();
+      modal.classList.remove('show');
     });
+
+    // Render subject cards
+    function renderSubjects() {
+      const grid = document.getElementById('subjectsGrid'); grid.innerHTML = '';
+      subjects.forEach(sub => {
+        // Calculate classes needed to reach 85%
+        let total = document.getElementById('totalClasses').value; 
+        let attended = document.getElementById('attendedClasses').value;
+        let needed = totalClassesNeededTo85(total, attended);
+        if (needed < 0) needed = 0;
+        const card = document.createElement('div'); card.className = 'subject-card';
+        card.innerHTML = `
+          <h3>${sub.name}</h3>
+          <p><strong>Total Classes:</strong> ${sub.total}</p>
+          <p><strong>Attended:</strong> ${sub.attended}</p>
+          <p><strong>Classes to reach 85%:</strong> ${needed}</p>
+          <button class="btn-attend" onclick="recordAttendance(${sub.id})">Record Today's Attendance</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // To calcualte total classes needed
+    function totalClassesNeededTo85(total, attended){
+        const raw = 0.85 * total - attended; 
+        return Math.max(0, Math.ceil(raw));
+    }
+
+    // Record attendance for today
+    function recordAttendance(id) {
+      const sub = subjects.find(s => s.id === id);
+      const attendedToday = confirm(`Did you attend "${sub.name}" today? OK = Yes, Cancel = No`);
+      sub.total += 1;
+      if (attendedToday) sub.attended += 1;
+      renderSubjects();
+    }
   </script>
 </body>
 </html>
