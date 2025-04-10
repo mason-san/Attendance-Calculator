@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash 
-from flask_login import login_user, logout_user, login_required 
-from models import db, User, bcrypt
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask_login import login_user, logout_user, login_required, current_user
+from models import db, User, bcrypt, UserAttendance
 from forms import RegistrationForms, LoginForm
 
 app_blueprint = Blueprint('app_blueprint', __name__)
@@ -48,3 +48,41 @@ def index():
 @login_required
 def home():
     return render_template("home.html")
+
+#send subjects to front end dashboard.html
+@app_blueprint.route('/get_subjects')
+def get_subjects():
+    data = UserAttendance.query.filter_by(user_id=current_user.id).all()
+    subjects = [{
+        "subject_name":s.name,
+        "total_classes":s.total_classes,
+        "attended_classes":s.attended_classes
+    } for s in data]
+
+    return jsonify(subjects)
+
+@app_blueprint.route('/add_subject', methods=["POST"])
+def add_subject():
+    #Getting the data
+    data = request.get_json()
+
+    #All modal class data gotten from the front-end
+    subject_name = data.get("subject_name")
+    total_classes = data.get("total_classes")
+    attended_classes = data.get("attended_classes")
+
+    print(f"Received Data: {subject_name}, {total_classes}, {attended_classes}")
+    #Getting the current user's id.
+    current_user_id = current_user.id
+    #Adding the data to database
+    user_attendance = UserAttendance(
+        user_id = current_user_id,
+        name=subject_name,
+        total_classes = total_classes,
+        attended_classes = attended_classes
+    )
+    #Adding to database.
+    db.session.add(user_attendance)
+    db.session.commit()
+
+    return jsonify({"message": "Subject Added Successfully!"}, 200)

@@ -107,7 +107,7 @@
 <body>
   <header>
     <nav>
-        <a href="{{ url_for('app_blueprint.dashboard') }}" class="logo">AttendancePlanner</a>
+        <a href="{{ url_for('app_blueprint.home') }}" class="logo">AttendancePlanner</a>
         <button id="addSubjectBtn" class="btn-add">Add Subject</button>
         <ul class="nav-links">
             <li><a href="{{ url_for('app_blueprint.logout') }}">Logout</a></li>
@@ -175,10 +175,30 @@
       renderSubjects();
       e.target.reset();
       modal.classList.remove('show');
+
+      //To send the data to backend 
+      fetch("/add_subject", {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json"
+        }, 
+        body: JSON.stringify({
+            subject_name: name,
+            total_classes: total,
+            attended_classes: attended
+        })
+      })
+      .then(response => response.json())
+      .then(data=>{
+        console.log("Success: ", data);
+      })
+      .catch(error=>{
+        console.error("Error: ", error);
+      });
     });
 
     // Render subject cards
-    function renderSubjects() {
+    /*function renderSubjects() {
       const grid = document.getElementById('subjectsGrid'); grid.innerHTML = '';
       subjects.forEach(sub => {
         // Calculate classes needed to reach 85%
@@ -196,7 +216,48 @@
         `;
         grid.appendChild(card);
       });
+    }*/
+
+    //New Rendering directly from the database
+    function renderSubjects(){
+        const grid = document.getElementById("subjectsGrid");
+        grid.innerHTML = '';
+
+        fetch('/get_subjects')
+            .then(response=>response.json())
+            .then(data=>{
+
+                if (data.length == 0){
+                    grid.innerHTML = `<p>No subjects added yet.</p>`
+                    return;
+                }
+
+                data.forEach(subject=>{
+                    let total = subject.total_classes;
+                    let attended = subject.attended_classes;
+                    let classesNeeded = totalClassesNeededTo85(total,attended);
+                    if (classesNeeded < 0) classesNeeded = 0;
+
+                    const card = document.createElement('div');
+                    card.className = 'subject-card';
+                    card.innerHTML = `
+                        <h3>${subject.subject_name}</h3>
+                        <p><strong>Total:</strong> ${total}</p> 
+                        <p><strong>Attended:</strong> ${attended}</p> 
+                        <p><strong>Classes to reach 85:</strong> ${classesNeeded}</p>
+                        <button class="btn-attend" onclick="recordAttendance(${subject.id})">Record Today's Attendance</button>
+                    `
+
+                    grid.appendChild(card)
+                });
+            })
+            .catch(error => {
+                console.error("Error loading subjects", error);
+                grid.innerHTML = `<p>Error Loading Subjects.</p>`;
+            })
     }
+
+    window.onload = renderSubjects;
 
     // To calcualte total classes needed
     function totalClassesNeededTo85(total, attended){
