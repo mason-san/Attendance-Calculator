@@ -2,8 +2,11 @@ from flask import Flask
 from config import Config
 from models import db, bcrypt, login_manager, User, UserAttendance
 from routes import app_blueprint
+from datetime import timedelta
 
 app = Flask(__name__)
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=15.0)
 
 #Load configuration from config.py
 app.config.from_object(Config) 

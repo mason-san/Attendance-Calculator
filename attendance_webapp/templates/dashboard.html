@@ -107,7 +107,7 @@
 <body>
   <header>
     <nav>
-        <a href="{{ url_for('app_blueprint.home') }}" class="logo">AttendancePlanner</a>
+        <a href="" class="logo">AttendancePlanner</a>
         <button id="addSubjectBtn" class="btn-add">Add Subject</button>
         <ul class="nav-links">
             <li><a href="{{ url_for('app_blueprint.logout') }}">Logout</a></li>
@@ -195,6 +195,32 @@
       .catch(error=>{
         console.error("Error: ", error);
       });
+
+      //Add the last element from the database to the card item thingoo 
+      fetch('/update_subject_card')
+        .then(response=>response.json())
+        .then(data=>{
+
+          console.log("Insideee");
+          data.forEach(subject=>{
+              let total = subject.total_classes;
+              let attended = subject.attended_classes;
+              let classesNeeded = totalClassesNeededTo85(total,attended);
+              if (classesNeeded < 0) classesNeeded = 0;
+
+              const card = document.createElement('div');
+              card.className = 'subject-card';
+              card.innerHTML = `
+                  <h3>${subject.subject_name}</h3>
+                  <p><strong>Total:</strong> ${total}</p> 
+                  <p><strong>Attended:</strong> ${attended}</p> 
+                  <p><strong>Classes to reach 85:</strong> ${classesNeeded}</p>
+                  <button class="btn-attend" onclick="recordAttendance(${subject.id})">Record Today's Attendance</button>
+              `
+
+              grid.appendChild(card)
+            });
+        });
     });
 
     // Render subject cards
@@ -231,6 +257,8 @@
                     grid.innerHTML = `<p>No subjects added yet.</p>`
                     return;
                 }
+
+                console.log(data.length);
 
                 data.forEach(subject=>{
                     let total = subject.total_classes;
