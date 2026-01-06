@@ -14,6 +14,21 @@ function App() {
 
   const [needAttend, setNeedAttend] = useState(0);
 
+  const [isUnlocked, setIsUnlocked] = useState(
+    localStorage.getItem("attendance_unlocked") === "true"
+  )
+
+  const handleUnlock = () => {
+    const confirmPay = window.confirm(
+      "Unlock full attendance planner for 99 (one-time)?"
+    );
+
+    if (confirmPay){
+      localStorage.setItem('attendance_unlocked', 'true');
+      setIsUnlocked(true);
+    }
+  }
+
   const handleCalculate = () => {
     const T = Number(totalClasses);
     const A = Number(attendedClasses);
@@ -98,16 +113,34 @@ function App() {
             </p>
 
             {status ===  "SAFE" && (
-              <p className='miss-text'>
-                You can miss <strong>{canMiss}</strong> more classes and still meet the requirement
-              </p>
+              isUnlocked ? (
+                <p className='miss-text'>
+                  You can miss <strong>{canMiss}</strong> more classes and still meet the requirement
+                </p>
+              ) : (
+                <div className='locked'>
+                  🔒 Unlock to see how many classes you can miss.
+                </div>
+              )
             )}
 
             {status === "DANGER" && (
-              <p className='miss-text'>
-                You need to attend <strong>{needAttend}</strong> more classes to reach the required attendance 
-                <strong><i>(based on total classes in the semester)</i></strong>
-              </p>
+              isUnlocked ? (
+                <p className='miss-text'>
+                  You need to attend <strong>{needAttend}</strong> more classes to reach the required attendance 
+                  <strong><i>(based on total classes in the semester)</i></strong>
+                </p>
+              ) : (
+                <div className='locked'>
+                  🔒 Unlock to see how many classes you need to attend
+                </div>
+              )
+            )}
+
+            {!isUnlocked && calculated && (
+              <button className='unlock-btn' onClick={handleUnlock}>
+                Unlock full planner - ₹99 (one-time)
+              </button>
             )}
           </div>
         )}
