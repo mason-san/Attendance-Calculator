@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — AttendancePlanner</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; font-size:16px; }
+    body { font-family: 'Roboto', sans-serif; background:#ecf0f1; color:#2c3e50; }
+
+    /* Header */
+    header {
+      position: fixed; top:0; left:0; width:100%;
+      background:#2c3e50; padding:1rem 0; z-index:1000;
+    }
+    .container { max-width:1200px; margin:0 auto; padding:0 1rem; }
+    nav { display:flex; align-items:center; justify-content:space-between; }
+    .logo { color:#1abc9c; font-size:1.5rem; font-weight:700; text-decoration:none; }
+    .nav-links { list-style:none; display:flex; gap:1.5rem; }
+    .nav-links a { color:#ecf0f1; text-decoration:none; font-weight:500; transition: color .3s; }
+    .nav-links a:hover { color:#1abc9c; }
+    .burger { display:none; cursor:pointer; }
+    .burger div { width:25px; height:3px; background:#ecf0f1; margin:5px 0; transition: all .3s; }
+
+    /* Main */
+    main { padding-top:6rem; display:flex; justify-content:center; align-items:center; min-height:calc(100vh - 6rem); }
+    .card {
+      background:#fff; padding:2rem; border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:400px;
+    }
+    .card h2 { text-align:center; margin-bottom:1.5rem; color:#2c3e50; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:.5rem; font-weight:500; }
+    .form-group input {
+      width:100%; padding:.75rem; border:1px solid #ccc;
+      border-radius:4px; font-size:1rem;
+      transition: border-color .3s;
+    }
+    .form-group input:focus { border-color:#1abc9c; outline:none; }
+    .btn {
+      width:100%; padding:.75rem; background:#1abc9c; color:#fff;
+      border:none; border-radius:4px; font-size:1rem; font-weight:500;
+      cursor:pointer; transition: background .3s;
+    }
+    .btn:hover { background:#16a085; }
+    .alt-link { text-align:center; margin-top:1rem; }
+    .alt-link a { color:#1abc9c; text-decoration:none; font-weight:500; }
+    .alt-link a:hover { text-decoration:underline; }
+
+    /* Flash messages */
+    .flash { background:#e74c3c; color:#fff; padding:.5rem 1rem; border-radius:4px; margin-bottom:1rem; }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .nav-links { display:none; position:absolute; top:100%; left:0; right:0; background:#2c3e50; flex-direction:column; padding:1rem; }
+      .nav-links.active { display:flex; }
+      .burger { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('app_blueprint.index') }}" class="logo">AttendancePlanner</a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('app_blueprint.register') }}">Register</a></li>
+          <li><a href="{{ url_for('app_blueprint.login') }}">Login</a></li>
+        </ul>
+        <div class="burger" id="burger">
+          <div></div><div></div><div></div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Create an Account</h2>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+          <div class="flash">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="POST" id="registerForm">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          <label for="username">Username</label>
+          {{ form.username(class="") }}
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          {{ form.email(class="") }}
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          {{ form.password(
+                class="", 
+                minlength=8,
+                pattern=".{8,}",
+                title="Must be 8 characters long"
+            ) }}
+            <small class="form-text text-muted">At least 8 characters long.</small>
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          {{ form.confirm_password(class="", minlength=8) }}
+        </div>
+        <button type="submit" class="btn">{{ form.submit.label.text }}</button>
+      </form>
+      <div class="alt-link">
+        <p>Already have an account? <a href="{{ url_for('app_blueprint.login') }}">Login</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer style="display:none;"></footer>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const navLinks = document.querySelector('.nav-links');
+    burger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      burger.classList.toggle('toggle');
+    });
+    const form = document.getElementById('registerForm');
+    const pw = document.querySelector('input[name="password"]');
+    const confirmPw = document.querySelector('input[name="confirm_password"]');
+
+    form.addEventListener('submit', e => {
+        if (pw.value.length < 8){
+            e.preventDefault();
+            alert("Password must be 8 length characters long.");
+            pw.focus();
+            return;
+        }
+        if(pw.value != confirmPw.value){
+            e.preventDefault();
+            alert("Password and confirm passwords aren't matching.");
+            confirmPw.focus();
+        }
+    });
+  </script>
+</body>
+</html>

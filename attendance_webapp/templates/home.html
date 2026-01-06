@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — AttendancePlanner</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; font-size:16px; }
+    body { font-family: 'Roboto', sans-serif; background:#ecf0f1; color:#2c3e50; }
+
+    /* Container */
+    .container { max-width:1200px; margin:0 auto; padding:0 1rem; }
+
+    /* Header & Nav */
+    header {
+      position: fixed; top:0; left:0; width:100%;
+      background:#2c3e50; padding:1rem 0; z-index:1000;
+    }
+    nav { display:flex; align-items:center; justify-content:space-between; }
+    .logo { color:#1abc9c; font-size:1.5rem; font-weight:700; text-decoration:none; }
+    .nav-links { list-style:none; display:flex; gap:1.5rem; }
+    .nav-links a {
+      color:#ecf0f1; text-decoration:none; font-weight:500;
+      transition: color .3s;
+    }
+    .nav-links a:hover { color:#1abc9c; }
+    .burger { display:none; cursor:pointer; }
+    .burger div {
+      width:25px; height:3px; background:#ecf0f1;
+      margin:5px 0; transition: all .3s;
+    }
+
+    /* Main */
+    main { padding-top:6rem; }
+
+    /* Add Subject Card */
+    #add-subject .card {
+      background:#fff; padding:2rem; border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      width:100%; max-width:400px; margin:2rem auto;
+    }
+    #add-subject .card h2 { text-align:center; margin-bottom:1.5rem; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:.5rem; font-weight:500; }
+    .form-group input {
+      width:100%; padding:.75rem; border:1px solid #ccc;
+      border-radius:4px; font-size:1rem;
+      transition: border-color .3s;
+    }
+    .form-group input:focus { border-color:#1abc9c; outline:none; }
+    .btn {
+      display:inline-block; padding:.75rem 1.5rem;
+      background:#1abc9c; color:#fff; border:none;
+      border-radius:4px; font-size:1rem; font-weight:500;
+      cursor:pointer; transition: background .3s;
+    }
+    .btn:hover { background:#16a085; }
+
+    /* Subjects Grid */
+    #subjects { padding:2rem 0; }
+    #subjects h2 { text-align:center; margin-bottom:1.5rem; }
+    .features-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+      gap:1.5rem;
+    }
+    .subject-card {
+      background:#fff; padding:1.5rem; border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1); position:relative;
+    }
+    .subject-card h3 { margin-bottom:1rem; color:#1abc9c; }
+    .subject-details p { margin:0.25rem 0; }
+    .attendance-btn {
+      position:absolute; top:1rem; right:1rem;
+      background:#1abc9c; color:#fff; border:none;
+      padding:.5rem; border-radius:4px; cursor:pointer;
+      transition: background .3s;
+    }
+    .attendance-btn:hover { background:#16a085; }
+
+    /* Recommendation */
+    .recommendation { margin-top:1rem; font-weight:500; color:#e74c3c; }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .nav-links {
+        display:none; position:absolute; top:100%;
+        left:0; right:0; background:#2c3e50;
+        flex-direction:column; padding:1rem;
+      }
+      .nav-links.active { display:flex; }
+      .burger { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('app_blueprint.index') }}" class="logo">AttendancePlanner</a>
+        <ul class="nav-links">
+          <li><a href="#add-subject">Add Subject</a></li>
+          <li><a href="#subjects">Your Subjects</a></li>
+        </ul>
+        <div class="burger" id="burger">
+          <div></div><div></div><div></div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Add Subject Section -->
+    <section id="add-subject">
+      <div class="container">
+        <div class="card">
+          <h2>Add New Subject</h2>
+          <form id="addSubjectForm">
+            <div class="form-group">
+              <label for="subjectName">Subject Name</label>
+              <input type="text" id="subjectName" required />
+            </div>
+            <div class="form-group">
+              <label for="totalClasses">Total Classes</label>
+              <input type="number" id="totalClasses" min="1" required />
+            </div>
+            <button type="submit" class="btn">Add Subject</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subjects Grid -->
+    <section id="subjects">
+      <div class="container">
+        <h2>Your Subjects</h2>
+        <div id="subjectsGrid" class="features-grid">
+          <!-- JS will inject subject cards here -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Nav burger toggle
+    const burger = document.getElementById('burger'),
+          navLinks = document.querySelector('.nav-links');
+    burger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      burger.classList.toggle('toggle');
+    });
+
+    // In-memory subject store
+    let subjects = [];
+
+    // Add Subject
+    document.getElementById('addSubjectForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('subjectName').value.trim();
+      const total = parseInt(document.getElementById('totalClasses').value);
+      if (!name || total < 1) return;
+      subjects.push({ id: Date.now(), name, total, attended: 0 });
+      renderSubjects();
+      e.target.reset();
+    });
+
+    // Render all subject cards
+    function renderSubjects() {
+      const grid = document.getElementById('subjectsGrid');
+      grid.innerHTML = '';
+      subjects.forEach(sub => {
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.innerHTML = `
+          <h3>${sub.name}</h3>
+          <div class="subject-details">
+            <p>Total Classes: <span id="total-${sub.id}">${sub.total}</span></p>
+            <p>Attended: <span id="attended-${sub.id}">${sub.attended}</span></p>
+            <p>Percentage: <span id="percent-${sub.id}">0%</span></p>
+          </div>
+          <button class="attendance-btn" onclick="recordAttendance(${sub.id})">Record Today</button>
+          <div class="recommendation" id="rec-${sub.id}"></div>
+        `;
+        grid.appendChild(card);
+        updateStats(sub.id);
+      });
+    }
+
+    // Record attendance for today
+    function recordAttendance(id) {
+      const sub = subjects.find(s => s.id === id);
+      const attendedToday = confirm(`Did you attend "${sub.name}" today? OK = Yes, Cancel = No`);
+      sub.total += 1;
+      if (attendedToday) sub.attended += 1;
+      updateStats(id);
+    }
+
+    // Update percentage & recommendation
+    function updateStats(id) {
+      const sub = subjects.find(s => s.id === id);
+      const percent = ((sub.attended / sub.total) * 100).toFixed(2);
+      document.getElementById(`attended-${id}`).innerText = sub.attended;
+      document.getElementById(`total-${id}`).innerText = sub.total;
+      document.getElementById(`percent-${id}`).innerText = `${percent}%`;
+
+      // Recommendation logic
+      const minPct = 75;
+      const maxMisses = Math.floor((sub.attended - (minPct/100)*sub.total) / (minPct/100));
+      const recEl = document.getElementById(`rec-${id}`);
+      if (maxMisses >= 0) {
+        recEl.innerText = `You can miss ${maxMisses} more class${maxMisses!==1?'es':''}.`;
+      } else {
+        recEl.innerText = `Attend all upcoming classes to reach ${minPct}%.`;
+      }
+    }
+  </script>
+</body>
+</html>
