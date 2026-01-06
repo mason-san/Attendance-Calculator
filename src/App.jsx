@@ -50,6 +50,7 @@ function App() {
   return (
     <div className='app'>
       <div className='title'>Attendance Calculator</div>
+      <div className='subtitle'>Calculate your attendance for a subject and plan your remaining classes.</div>
 
       <div className='card'>
         <label>Total classes in the semester (for this subject)</label>
@@ -57,9 +58,10 @@ function App() {
           type='number'
           value={totalClasses}
           onChange={(e) => setTotalClasses(e.target.value)}
+          placeholder='for one subject'
           />
 
-        <label>Classes attended</label>
+        <label>Classes attended so far</label>
         <input
           type='number'
           value={attendedClasses}
@@ -67,15 +69,16 @@ function App() {
           />
 
         
-        <label>Required Classes</label>
+        <label>Required attendance percentage</label>
         <input  
           type='number'
           value={requiredPercentage}
           onChange={(e) => setRequiredPercentage(e.target.value)}
+          placeholder='(e.g. 75)'
           />
 
         <button className='calculate-btn' onClick={handleCalculate}>
-          Calculate
+          Calculate My Attendance
         </button>
 
 
@@ -83,7 +86,7 @@ function App() {
 
         {!calculated && (
           <p className='placeholder'>
-            Enter your details and click calculate
+            Enter your details to see your attendance status
           </p>
         )}
 
@@ -91,22 +94,27 @@ function App() {
           <div className='results'>
             <h2 className='big-number'>{attendance}%</h2>
             <p className={`status ${status.toLowerCase()}`}>
-              {status === "SAFE" ? "SAFE " : "DANGER "}
+              {status === "SAFE" ? "SAFE ✅" : "DANGER ❌"}
             </p>
 
             {status ===  "SAFE" && (
               <p className='miss-text'>
-                You can miss <strong>{canMiss}</strong> classes
+                You can miss <strong>{canMiss}</strong> more classes and still meet the requirement
               </p>
             )}
 
             {status === "DANGER" && (
               <p className='miss-text'>
-                You need to attend <strong>{needAttend}</strong> classes to recover
+                You need to attend <strong>{needAttend}</strong> more classes to reach the required attendance 
+                <strong><i>(based on total classes in the semester)</i></strong>
               </p>
             )}
           </div>
         )}
+
+        <p className='info-note'>
+          ℹ️ Calculations are based on the total number of classes in the semester for this subject.
+        </p>
       </div>
     </div>
   );

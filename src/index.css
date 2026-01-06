@@ -20,6 +20,13 @@ body{
   margin-bottom: 24px;
 }
 
+.subtitle {
+  text-align: center;
+  margin: 0px 5px 10px ;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
 .card { 
   background: #111;
   padding: 20px;
@@ -87,4 +94,12 @@ input {
 
 .miss-text {
   font-size: 16px;
+}
+
+.info-note {
+  margin-top: 16px;
+  font-size: 12px;
+  opacity: 0.6;
+  text-align: center;
+  line-height: 1.4;
 }
