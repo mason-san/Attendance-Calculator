@@ -12,6 +12,8 @@ function App() {
   const [status, setStatus] = useState("");
   const [canMiss, setCanMiss] = useState(0);
 
+  const [needAttend, setNeedAttend] = useState(0);
+
   const handleCalculate = () => {
     const T = Number(totalClasses);
     const A = Number(attendedClasses);
@@ -27,16 +29,20 @@ function App() {
     const currentAttendance = (A / T) * 100; 
     setAttendance(currentAttendance.toFixed(2));
 
-    //status
-    if (currentAttendance >= R) {
+    const minRequiredAttended = (R * T) / 100;
+
+    if (A >= minRequiredAttended) {
       setStatus("SAFE");
+      const maxMiss = Math.floor(T - A - (minRequiredAttended - A));
+      setCanMiss(maxMiss > 0 ? maxMiss: 0);
+      setNeedAttend(0);
     } else {
       setStatus("DANGER");
-    }
+      setCanMiss(0);
 
-    //max classes you can miss
-    const maxMiss = Math.floor((A*100) / R - T);
-    setCanMiss(maxMiss > 0 ? maxMiss : 0);
+      const needed = Math.ceil(minRequiredAttended - A);
+      setNeedAttend(needed > 0 ? needed: 0);
+    }
 
     setCalculated(true);
   };
@@ -46,7 +52,7 @@ function App() {
       <div className='title'>Attendance Calculator</div>
 
       <div className='card'>
-        <label>Total Number of classes</label>
+        <label>Total classes in the semester (for this subject)</label>
         <input 
           type='number'
           value={totalClasses}
@@ -88,9 +94,17 @@ function App() {
               {status === "SAFE" ? "SAFE " : "DANGER "}
             </p>
 
-            <p className='miss-text'>
-              You can miss <strong>{canMiss}</strong> classes
-            </p>
+            {status ===  "SAFE" && (
+              <p className='miss-text'>
+                You can miss <strong>{canMiss}</strong> classes
+              </p>
+            )}
+
+            {status === "DANGER" && (
+              <p className='miss-text'>
+                You need to attend <strong>{needAttend}</strong> classes to recover
+              </p>
+            )}
           </div>
         )}
       </div>
