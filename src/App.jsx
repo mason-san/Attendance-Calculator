@@ -104,16 +104,19 @@ function App() {
 
             {!calculated && (
               <p className='placeholder'>
-                Enter your details to see your attendance status
+                Enter your details to see if your safe <br/> or how to recover 
               </p>
             )}
 
             {calculated && (
               <div className='results'>
+                <p>Your attendance</p>
                 <h2 className='big-number'>{attendance}%</h2>
                 <p className={`status ${status.toLowerCase()}`}>
-                  {status === "SAFE" ? "SAFE ✅" : "DANGER ❌"}
+                  {status === "SAFE" ? "SAFE ✅ \n You're meeting the requirement" : "DANGER ❌"}
                 </p>
+
+                <br/><br/>
 
                 {status ===  "SAFE" && (
                   isUnlocked ? (
@@ -145,10 +148,6 @@ function App() {
                     Paid version coming soon - ₹99 (one-time)
                   </button>
                 )}
-
-                <p className='soft-cta'>
-                  Want this sooner? Share with friends or check back later.
-                </p>
               </div>
             )}
 
