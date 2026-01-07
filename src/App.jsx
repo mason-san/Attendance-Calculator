@@ -111,7 +111,12 @@ function App() {
             {calculated && (
               <div className='results'>
                 <p>Your attendance</p>
-                <h2 className='big-number'>{attendance}%</h2>
+                <h2
+                 className={`big-number ${
+                  status === "SAFE" ? "animate-safe" : ""
+                }`}>
+                  {attendance}%
+                </h2>
                 <p className={`status ${status.toLowerCase()}`}>
                   {status === "SAFE" ? "SAFE ✅ \n You're meeting the requirement" : "DANGER ❌"}
                 </p>
