@@ -18,16 +18,16 @@ function App() {
     localStorage.getItem("attendance_unlocked") === "true"
   )
 
-  const handleUnlock = () => {
-    const confirmPay = window.confirm(
-      "Unlock full attendance planner for 99 (one-time)?"
-    );
+  // const handleUnlock = () => {
+  //   const confirmPay = window.confirm(
+  //     "Unlock full attendance planner for 99 (one-time)?"
+  //   );
 
-    if (confirmPay){
-      localStorage.setItem('attendance_unlocked', 'true');
-      setIsUnlocked(true);
-    }
-  }
+  //   if (confirmPay){
+  //     localStorage.setItem('attendance_unlocked', 'true');
+  //     setIsUnlocked(true);
+  //   }
+  // }
 
   const handleCalculate = () => {
     const T = Number(totalClasses);
@@ -68,86 +68,95 @@ function App() {
       <div className='subtitle'>Calculate your attendance for a subject and plan your remaining classes.</div>
 
       <div className='card'>
-        <label>Total classes in the semester (for this subject)</label>
-        <input 
-          type='number'
-          value={totalClasses}
-          onChange={(e) => setTotalClasses(e.target.value)}
-          placeholder='for one subject'
-          />
+        <div className='layout'>
+          <div  className='inputs'>
+            <label>Total classes in the semester (for this subject)</label>
+            <input 
+              type='number'
+              value={totalClasses}
+              onChange={(e) => setTotalClasses(e.target.value)}
+              placeholder='for one subject'
+              />
 
-        <label>Classes attended so far</label>
-        <input
-          type='number'
-          value={attendedClasses}
-          onChange={(e) => setAttendedClasses(e.target.value)}
-          />
+            <label>Classes attended so far</label>
+            <input
+              type='number'
+              value={attendedClasses}
+              onChange={(e) => setAttendedClasses(e.target.value)}
+              />
 
-        
-        <label>Required attendance percentage</label>
-        <input  
-          type='number'
-          value={requiredPercentage}
-          onChange={(e) => setRequiredPercentage(e.target.value)}
-          placeholder='(e.g. 75)'
-          />
+            
+            <label>Required attendance percentage</label>
+            <input  
+              type='number'
+              value={requiredPercentage}
+              onChange={(e) => setRequiredPercentage(e.target.value)}
+              placeholder='(e.g. 75)'
+              />
 
-        <button className='calculate-btn' onClick={handleCalculate}>
-          Calculate My Attendance
-        </button>
-
-
-        <div className='divider' />
-
-        {!calculated && (
-          <p className='placeholder'>
-            Enter your details to see your attendance status
-          </p>
-        )}
-
-        {calculated && (
-          <div className='results'>
-            <h2 className='big-number'>{attendance}%</h2>
-            <p className={`status ${status.toLowerCase()}`}>
-              {status === "SAFE" ? "SAFE ✅" : "DANGER ❌"}
-            </p>
-
-            {status ===  "SAFE" && (
-              isUnlocked ? (
-                <p className='miss-text'>
-                  You can miss <strong>{canMiss}</strong> more classes and still meet the requirement
-                </p>
-              ) : (
-                <div className='locked'>
-                  🔒 Unlock to see how many classes you can miss.
-                </div>
-              )
-            )}
-
-            {status === "DANGER" && (
-              isUnlocked ? (
-                <p className='miss-text'>
-                  You need to attend <strong>{needAttend}</strong> more classes to reach the required attendance 
-                  <strong><i>(based on total classes in the semester)</i></strong>
-                </p>
-              ) : (
-                <div className='locked'>
-                  🔒 Unlock to see how many classes you need to attend
-                </div>
-              )
-            )}
-
-            {!isUnlocked && calculated && (
-              <button className='unlock-btn' onClick={handleUnlock}>
-                Unlock full planner - ₹99 (one-time)
-              </button>
-            )}
+            <button className='calculate-btn' onClick={handleCalculate}>
+              Calculate My Attendance
+            </button>
           </div>
-        )}
 
-        <p className='info-note'>
-          ℹ️ Calculations are based on the total number of classes in the semester for this subject.
-        </p>
+          <div className='results-panel'>
+            <div className='divider' />
+
+            {!calculated && (
+              <p className='placeholder'>
+                Enter your details to see your attendance status
+              </p>
+            )}
+
+            {calculated && (
+              <div className='results'>
+                <h2 className='big-number'>{attendance}%</h2>
+                <p className={`status ${status.toLowerCase()}`}>
+                  {status === "SAFE" ? "SAFE ✅" : "DANGER ❌"}
+                </p>
+
+                {status ===  "SAFE" && (
+                  isUnlocked ? (
+                    <p className='miss-text'>
+                      You can miss <strong>{canMiss}</strong> more classes and still meet the requirement
+                    </p>
+                  ) : (
+                    <div className='locked'>
+                      🔒 Premium feature -- paid version launching soon. 
+                    </div>
+                  )
+                )}
+
+                {status === "DANGER" && (
+                  isUnlocked ? (
+                    <p className='miss-text'>
+                      You need to attend <strong>{needAttend}</strong> more classes to reach the required attendance 
+                      <strong><i>(based on total classes in the semester)</i></strong>
+                    </p>
+                  ) : (
+                    <div className='locked'>
+                      🔒 Premium feature - paid version launching soon.
+                    </div>
+                  )
+                )}
+
+                {!isUnlocked && calculated && (
+                  <button className='unlock-btn' disabled>
+                    Paid version coming soon - ₹99 (one-time)
+                  </button>
+                )}
+
+                <p className='soft-cta'>
+                  Want this sooner? Share with friends or check back later.
+                </p>
+              </div>
+            )}
+
+            <p className='info-note'>
+              ℹ️ Calculations are based on the total number of classes in the semester for this subject.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

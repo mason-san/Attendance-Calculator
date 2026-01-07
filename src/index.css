@@ -5,7 +5,7 @@
 body{
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: #0e0e0e;
+  background: #121212;
   color: white;
 }
 
@@ -28,9 +28,10 @@ body{
 }
 
 .card { 
-  background: #111;
+  background: #1a1a1a;
   padding: 20px;
   border-radius: 12px;
+  width: 100%;
 }
 
 label {
@@ -46,6 +47,12 @@ input {
   border-radius: 999px;
   border: none;
   margin-bottom: 16px;
+  background: #f2f2f2;
+  color: #111;
+}
+
+input::placeholder{
+  color: #777;
 }
 
 .calculate-btn {
@@ -124,4 +131,51 @@ input {
   border: none;
   font-weight: bold;
   cursor:  pointer; 
+}
+
+.unlock-btn:disabled{
+  background:  #444;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.layout {
+  display: flex; 
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px){
+  .app {
+    max-width: 1000px;
+    font-size: 20px;
+  }
+
+  .card {
+    border-radius: 16px;
+    box-shadow:  0 10px 40px rgba(0,0,0,0.4);
+  }
+
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .inputs {
+    width: 50%;
+  }
+
+  .results-panel {
+    width: 50%;
+    padding-left: 24px;
+  }
+
+  .calculate-btn {
+    margin-top:  78px;
+  }
+
+  .divider {
+    display: none;
+  }
 }
